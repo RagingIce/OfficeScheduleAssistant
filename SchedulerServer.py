@@ -71,12 +71,12 @@ class SchedulerRequesetHandler(BaseHTTPRequestHandler):
       logging.error(traceback.format_exc())
       self._set_headers(500)
 
-def run(server_class=HTTPServer, handler_class=SchedulerRequesetHandler, port=8080, host='localhost', cert_path='./server.pem', key_path='./key.pem'):
+def run(server_class=HTTPServer, handler_class=SchedulerRequesetHandler, port=8080, host='localhost', cert_path='./server.pem'):
   server_address = (host, port)
   httpd = server_class(server_address, handler_class)
   if port == 4443:
     context = ssl.create_default_context()
-    httpd.socket = context.wrap_socket(httpd.socket, keyfile=key_path, certfile=cert_path, server_side=True)
+    httpd.socket = context.wrap_socket(httpd.socket, certfile=cert_path, server_side=True)
   
   print('Starting httpd...')
   httpd.serve_forever()
@@ -84,7 +84,7 @@ def run(server_class=HTTPServer, handler_class=SchedulerRequesetHandler, port=80
 if __name__ == "__main__":
   from sys import argv
 
-  if len(argv) == 5:
-    run(port=int(argv[1]), host=argv[2], cert_path=argv[3], key_path=argv[4])
+  if len(argv) == 4:
+    run(port=int(argv[1]), host=argv[2], cert_path=argv[3])
   else:
     run()
