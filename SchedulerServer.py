@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
-
 from urllib import parse
-import re
-import json
-import logging
-import traceback
 from datetime import datetime
 from ScheduleAccessor import ScheduleAccessor
+import re, json, logging, traceback, ssl
 
 class SchedulerRequesetHandler(BaseHTTPRequestHandler):
   def _set_headers(self, response_code=200, content_type='text/html'):
@@ -71,16 +67,19 @@ class SchedulerRequesetHandler(BaseHTTPRequestHandler):
       logging.error(traceback.format_exc())
       self._set_headers(500)
 
-def run(server_class=HTTPServer, handler_class=SchedulerRequesetHandler, port=8080):
+def run(server_class=HTTPServer, handler_class=SchedulerRequesetHandler, port=8080, cert_path='./server.pem'):
   server_address = ('', port)
   httpd = server_class(server_address, handler_class)
+  if port == 443:
+    httpd.socket = ssl.wrap_socket (httpd.socket, certfile=cert_path, server_side=True)
+  
   print('Starting httpd...')
   httpd.serve_forever()
 
 if __name__ == "__main__":
   from sys import argv
 
-  if len(argv) == 2:
-    run(port=int(argv[1]))
+  if len(argv) == 3:
+    run(port=int(argv[1]), cert_path=argv[2])
   else:
     run()
