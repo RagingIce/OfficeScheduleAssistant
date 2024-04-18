@@ -74,7 +74,7 @@ class SchedulerRequesetHandler(BaseHTTPRequestHandler):
 def run(server_class=HTTPServer, handler_class=SchedulerRequesetHandler, port=8080, host='localhost', cert_path='./server.pem', key_path='./key.pem'):
   server_address = (host, port)
   httpd = server_class(server_address, handler_class)
-  if port == 443:
+  if port == 4443:
     httpd.socket = ssl.wrap_socket(httpd.socket, keyfile=key_path, certfile=cert_path, server_side=True)
   
   print('Starting httpd...')
