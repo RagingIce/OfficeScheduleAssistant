@@ -22,7 +22,7 @@ class SchedulerRequesetHandler(BaseHTTPRequestHandler):
 
   def do_GET(self):
     try:
-      pathMatch = re.fullmatch('\/schedule\/([a-zA-Z]+)\/(\d{4}-\d{2}-\d{2})', self.path)
+      pathMatch = re.fullmatch('\\/schedule\\/([a-zA-Z]+)\\/(\\d{4}-\\d{2}-\\d{2})', self.path)
       if pathMatch:
         user = pathMatch.group(1)
         date = datetime.strptime(pathMatch.group(2), '%Y-%m-%d')
@@ -40,8 +40,8 @@ class SchedulerRequesetHandler(BaseHTTPRequestHandler):
 
   def do_POST(self):
     try:
-      schedulePathMatch = re.fullmatch('\/schedule', self.path)
-      vacationPathMatch = re.fullmatch('\/vacation', self.path)
+      schedulePathMatch = re.fullmatch('\\/schedule', self.path)
+      vacationPathMatch = re.fullmatch('\\/vacation', self.path)
       
       if schedulePathMatch or vacationPathMatch:
         form_data = self._get_form_data()
