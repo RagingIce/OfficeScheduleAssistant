@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib import parse
 from datetime import datetime
 from ScheduleAccessor import ScheduleAccessor
@@ -8,25 +5,37 @@ import re
 import json
 import logging
 import traceback
-import ssl
 
-class SchedulerRequesetHandler(BaseHTTPRequestHandler):
+class ScheduleRequestHandler:
+  __request = None
+  __response = None
+
+  def __init__(self, request, response):
+    self.__request = request
+    self.__response = response
+
+  def handle():
+    if self.__request.method == 'GET':
+      self.do_GET()
+    elif self.__request.method == 'POST':
+      self.do_POST()
+    else:
+      self.set_headers(405)
+
   def _set_headers(self, response_code=200, content_type='text/html'):
-    self.send_response(response_code)
-    self.send_header('Content-type', content_type)
-    self.end_headers()
+    self.__response.set_status(response_code)
+    self.__response.set_header('Content-Type', content_type)
 
     if response_code >= 300:
-      self.wfile.write(bytes(f"HTTP Response {response_code}","utf-8"))
+      self.__response.write(f"HTTP Response {response_code}")
 
   def _get_form_data(self):
-    length = int(self.headers.get('content-length'))
-    content = self.rfile.read(length)
-    return dict(parse.parse_qsl(str(content,'UTF-8')))
+    content = self.__request.body
+    return dict(parse.parse_qsl(content))
 
   def do_GET(self):
     try:
-      pathMatch = re.fullmatch('\\/schedule\\/([a-zA-Z]+)\\/(\\d{4}-\\d{2}-\\d{2})', self.path)
+      pathMatch = re.fullmatch('\\/schedule\\/([a-zA-Z]+)\\/(\\d{4}-\\d{2}-\\d{2})', self.__request.path)
       if pathMatch:
         user = pathMatch.group(1)
         date = datetime.strptime(pathMatch.group(2), '%Y-%m-%d')
@@ -44,8 +53,8 @@ class SchedulerRequesetHandler(BaseHTTPRequestHandler):
 
   def do_POST(self):
     try:
-      schedulePathMatch = re.fullmatch('\\/schedule', self.path)
-      vacationPathMatch = re.fullmatch('\\/vacation', self.path)
+      schedulePathMatch = re.fullmatch('\\/schedule', self.__request.path)
+      vacationPathMatch = re.fullmatch('\\/vacation', self.__request.path)
       
       if schedulePathMatch or vacationPathMatch:
         form_data = self._get_form_data()
@@ -70,21 +79,3 @@ class SchedulerRequesetHandler(BaseHTTPRequestHandler):
     except Exception as e:
       logging.error(traceback.format_exc())
       self._set_headers(500)
-
-def run(server_class=HTTPServer, handler_class=SchedulerRequesetHandler, port=8080, host='localhost', cert_path='./server.pem'):
-  server_address = (host, port)
-  httpd = server_class(server_address, handler_class)
-  if port == 4443:
-    context = ssl.create_default_context()
-    httpd.socket = context.wrap_socket(httpd.socket, certfile=cert_path, server_side=True)
-  
-  print('Starting httpd...')
-  httpd.serve_forever()
-
-if __name__ == "__main__":
-  from sys import argv
-
-  if len(argv) == 4:
-    run(port=int(argv[1]), host=argv[2], cert_path=argv[3])
-  else:
-    run()
