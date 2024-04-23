@@ -39,10 +39,10 @@ class CGIResponse:
   response_content = ""
 
   def send(self):
-    (print f'{k}: {v}' for k, v in self.response_headers)
-    print
-    print self.response_content
-
+    (print (f'{k}: {v}') for k, v in self.response_headers)
+    print ()
+    print (self.response_content)
+    
   def set_status(self, code=200):
     status_enum = HTTPStatus(status_code)
     set_header('Status', f'{status_enum.value} {status_enum.phrase}')
