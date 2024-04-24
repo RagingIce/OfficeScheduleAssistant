@@ -14,7 +14,7 @@ class ScheduleRequestHandler:
     self.__request = request
     self.__response = response
 
-  def handle():
+  def handle(self):
     if self.__request.method == 'GET':
       self.do_GET()
     elif self.__request.method == 'POST':
@@ -44,7 +44,7 @@ class ScheduleRequestHandler:
         booking_data = sched.get_booking_info(date)
 
         self._set_headers(200, 'application/json');  
-        self.__request.write(json.dumps(booking_data).encode(encoding='utf_8'))
+        self.__response.write(json.dumps(booking_data))
       else:
         self._set_headers(404)
     except Exception as e:

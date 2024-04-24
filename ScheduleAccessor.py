@@ -1,5 +1,7 @@
 from datetime import datetime
 import json
+import os, os.path
+import traceback, logging
 
 class ScheduleAccessor:
   __user = None
@@ -28,8 +30,8 @@ class ScheduleAccessor:
   def add_vacation(self, form_data):
     self.__load()
     #convert to a date to validate that the input is a date. It will get converted back to a string when dumped
-    start_date = datetime.strptime(form_data['StartDate'], '%Y-%m-%d')
-    end_date   = datetime.strptime(form_data['EndDate'], '%Y-%m-%d')
+    start_date = datetime.strptime(form_data['StartDate'].strip(), '%Y-%m-%d')
+    end_date   = datetime.strptime(form_data['EndDate'].strip(), '%Y-%m-%d')
     
     self.__vacations.append((start_date, end_date))
 
@@ -46,7 +48,7 @@ class ScheduleAccessor:
     self.__persist()
 
   def __persist(self):
-    f = self.__getFile('w')
+    f = self.__getFile('w+')
     f.write(self.__serialize())
     f.close()
 
@@ -64,10 +66,11 @@ class ScheduleAccessor:
 
   def __getFile(self, mode='r'):
     try:
-      persistance_dir = 'schedules'
+      persistance_dir = f'{os.path.dirname(os.path.realpath(__file__))}/schedules'
       return open(f'{persistance_dir}/{self.__user}_schedule.txt', mode)
     
-    except FileNotFoundError:
+    except:
+      logging.error(traceback.format_exc())
       return None
 
   def __serialize(self):
