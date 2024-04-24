@@ -44,7 +44,7 @@ class ScheduleRequestHandler:
         booking_data = sched.get_booking_info(date)
 
         self._set_headers(200, 'application/json');  
-        self.wfile.write(json.dumps(booking_data).encode(encoding='utf_8'))
+        self.__request.write(json.dumps(booking_data).encode(encoding='utf_8'))
       else:
         self._set_headers(404)
     except Exception as e:

@@ -42,7 +42,7 @@ class CGIResponse:
     (print (f'{k}: {v}') for k, v in self.response_headers)
     print ()
     print (self.response_content)
-    
+
   def set_status(self, code=200):
     status_enum = HTTPStatus(status_code)
     set_header('Status', f'{status_enum.value} {status_enum.phrase}')
@@ -53,5 +53,8 @@ class CGIResponse:
   def write(self, content):
     self.response_content = self.response_content + content + '\n'
 
-if __name__ == "__main__":
-  CGIHandler().handle_request()
+try:
+  if __name__ == "__main__":
+    CGIHandler().handle_request()
+except:
+  sys.stderr.write("exception!!\n")
