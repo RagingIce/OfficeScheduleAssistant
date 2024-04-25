@@ -60,9 +60,13 @@ class ScheduleAccessor:
     schedule_info = f.read()
     f.close()
 
-    schedule_json = json.loads(schedule_info)
-    self.__schedule = schedule_json['schedule']
-    self.__vacations = list(map(lambda date_tuple: (datetime.strptime(date_tuple[0], '%Y-%m-%d %H:%M:%S'), datetime.strptime(date_tuple[1], '%Y-%m-%d %H:%M:%S')), schedule_json['vacations']))
+    try:
+      schedule_json = json.loads(schedule_info)
+      self.__schedule = schedule_json['schedule']
+      self.__vacations = list(map(lambda date_tuple: (datetime.strptime(date_tuple[0], '%Y-%m-%d %H:%M:%S'), datetime.strptime(date_tuple[1], '%Y-%m-%d %H:%M:%S')), schedule_json['vacations']))
+    
+    except:
+      return
 
   def __getFile(self, mode='r'):
     try:
