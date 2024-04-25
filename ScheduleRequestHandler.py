@@ -27,6 +27,7 @@ class ScheduleRequestHandler:
     self.__response.set_header('Content-Type', content_type)
 
     if response_code >= 300:
+      logging.error(traceback.format_exc())
       self.__response.write(f"HTTP Response {response_code}")
 
   def _get_form_data(self):
