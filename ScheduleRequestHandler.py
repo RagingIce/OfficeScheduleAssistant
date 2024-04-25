@@ -25,7 +25,9 @@ class ScheduleRequestHandler:
   def _set_headers(self, response_code=200, content_type='text/html'):
     self.__response.set_status(response_code)
     self.__response.set_header('Content-Type', content_type)
-    self.__response.write(f"HTTP Response {response_code}")
+    
+    if(response_code >= 300):
+      self.__response.write(f"HTTP Response {response_code}")
 
   def _get_form_data(self):
     content = self.__request.body
