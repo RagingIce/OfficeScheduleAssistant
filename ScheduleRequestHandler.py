@@ -36,12 +36,21 @@ class ScheduleRequestHandler:
   def do_GET(self):
     try:
       pathMatch = re.fullmatch('\\/schedule\\/([a-zA-Z]+)\\/(\\d{4}-\\d{2}-\\d{2})', self.__request.path)
+
       if pathMatch:
         user = pathMatch.group(1)
         date = datetime.strptime(pathMatch.group(2), '%Y-%m-%d')
+        booking_data = dict()
         
-        sched = ScheduleAccessor(user)
-        booking_data = sched.get_booking_info(date)
+        if user == 'all':
+          sched_users = ScheduleAccessor.get_all_users()
+          for sched_user in sched_users:
+            sched = ScheduleAccessor(sched_user)
+            booking_data[sched_user] = sched.get_booking_info(date)
+
+        else:
+          sched = ScheduleAccessor(user)
+          booking_data = sched.get_booking_info(date)
 
         self._set_headers(200, 'application/json');  
         self.__response.write(json.dumps(booking_data))

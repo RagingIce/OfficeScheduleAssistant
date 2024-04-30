@@ -1,6 +1,8 @@
 from datetime import datetime
 import json
 import os, os.path
+from os import listdir
+from os.path import isfile, join
 import traceback, logging
 
 class ScheduleAccessor:
@@ -46,6 +48,11 @@ class ScheduleAccessor:
     self.__schedule['Friday']    = form_data.get('Friday',    None)
 
     self.__persist()
+
+  @staticmethod
+  def get_all_users():
+    persistance_dir = f'{os.path.dirname(os.path.realpath(__file__))}/schedules'
+    return [f.replace('_schedule.txt', '') for f in listdir(persistance_dir) if isfile(join(persistance_dir, f))]
 
   def __persist(self):
     f = self.__getFile('w+')
