@@ -5,6 +5,7 @@ import re
 import json
 import logging
 import traceback
+import os, os.path
 
 class ScheduleRequestHandler:
   __request = None
@@ -15,12 +16,17 @@ class ScheduleRequestHandler:
     self.__response = response
 
   def handle(self):
+    expected_api_key = self.__get_api_key_from_file()
+    if expected_api_key != None and self.__request.api_key != expected_api_key:
+      self._set_headers(401)
+      return
+
     if self.__request.method == 'GET':
       self.do_GET()
     elif self.__request.method == 'POST':
       self.do_POST()
     else:
-      self.set_headers(405)
+      self._set_headers(405)
 
   def _set_headers(self, response_code=200, content_type='text/html'):
     self.__response.set_status(response_code)
@@ -88,3 +94,12 @@ class ScheduleRequestHandler:
     except Exception as e:
       logging.error(traceback.format_exc())
       self._set_headers(500)
+  
+  def __get_api_key_from_file(self):
+    try:
+      api_key_file_name = f'{os.path.dirname(os.path.realpath(__file__))}/apikey.txt'
+      api_key_file = open(api_key_file_name, 'r')
+      return api_key_file.read().strip()
+
+    except:
+      return None

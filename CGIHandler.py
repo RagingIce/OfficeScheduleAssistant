@@ -31,9 +31,10 @@ class CGIRequest:
     self.content_length = int(os.environ.get('CONTENT_LENGTH', '0'))
     self.path           = os.environ.get('REQUEST_URI')
     self.query_string   = os.environ.get('QUERY_STRING', '')
+    self.api_key        = os.environ.get('HTTP_X_API_KEY', '').strip()
 
     if(self.content_length > 0):
-      self.body         = sys.stdin.read()
+      self.body         = sys.stdin.read(self.content_length)
 
 class CGIResponse:
   response_headers = dict()
